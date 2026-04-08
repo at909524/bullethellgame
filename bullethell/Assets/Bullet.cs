@@ -9,6 +9,10 @@ public class Bullet : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        //Destroy after 3 seconds
+        Destroy(gameObject, 3f);
+
+
         //Get comonents to use
         rb = GetComponent<Rigidbody2D>();
 
