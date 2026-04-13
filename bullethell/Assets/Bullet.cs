@@ -6,6 +6,8 @@ public class Bullet : MonoBehaviour
     Vector2 direction;
     public float speed = 8f;
 
+    public int damage = 1;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

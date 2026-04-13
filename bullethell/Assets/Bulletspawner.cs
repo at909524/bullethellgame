@@ -6,6 +6,9 @@ public class Bulletspawner : MonoBehaviour
     public GameObject bullet;
     private float spawn_timer = 0;
 
+    public int max_bullets_at_a_time = 5;
+    public float min_spawn_time = 0.25f;
+    public float max_spawn_time = 1f;
 
 
     // Update is called once per frame
@@ -15,8 +18,17 @@ public class Bulletspawner : MonoBehaviour
         spawn_timer -= Time.deltaTime;
         if(spawn_timer <= 0)
         {
-            spawn_timer = 1;
-            SpawnBullet();
+            //Give the timer a random spawn time
+            spawn_timer = Random.Range(min_spawn_time, max_spawn_time);
+
+            //create a variable for th enumber o fubllets to spawn
+            int bullets_to_spawn = Random.Range(1, max_bullets_at_a_time + 1);
+
+            //Spawn that numbe of bullets
+            for (int i = 0; i < bullets_to_spawn; i++)
+            {
+                SpawnBullet();
+            }
         }
     }
 

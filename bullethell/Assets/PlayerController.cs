@@ -9,6 +9,8 @@ public class PlayerController : MonoBehaviour
 
     public float speed = 5f;
 
+    public int health = 10;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -64,8 +66,11 @@ public class PlayerController : MonoBehaviour
         rb.MovePosition(rb.position + (direction * speed * Time.fixedDeltaTime));
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
+        //Subtract the damage the bullet does from the health
+        health -= collision.GetComponent<Bullet>().damage;
+
         //Destroy the bullet
         Destroy(collision.gameObject);
     }
