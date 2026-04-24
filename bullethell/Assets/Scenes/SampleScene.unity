@@ -535,13 +535,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 845311668}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.45, y: 0.5, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0.07, y: 0.5, z: 0}
   m_LocalScale: {x: 3.4782608, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1000776829}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
 --- !u!1 &1000776828
 GameObject:
   m_ObjectHideFlags: 0
@@ -644,9 +644,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1000776828}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9d234fe1923dbc4c84759f61f175dad, type: 3}
+  m_Script: {fileID: 11500000, guid: 5c03763363802a94da19d1fca13490b1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Bulletshooter
+  m_EditorClassIdentifier: Assembly-CSharp::shooting
+  bulletPrefab: {fileID: 0}
+  firePoint: {fileID: 845311669}
+  bulletForce: 20
 --- !u!1001 &1399308757
 PrefabInstance:
   m_ObjectHideFlags: 0
