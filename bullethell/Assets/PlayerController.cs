@@ -1,83 +1,106 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
-    //Used to store the users inputs to make the player move
-    private Vector2 direction = Vector2.zero;
+    [Header("Movement")]
+    public float moveSpeed = 5f;
 
+    [Header("Health")]
+    public int maxHits = 3;
+
+    [Header("UI")]
+    public TextMeshProUGUI livesText;
+    public TextMeshProUGUI enemiesLeftText;
+
+    [Header("Game")]
+    public int maxEnemies = 10;
+
+    private int currentHits;
     private Rigidbody2D rb;
+    private Vector2 movement;
 
-    public float speed = 5f;
-
-    public int health = 10;
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
+    void Start()
+    {
+        currentHits = maxHits;
+
+        // Reset enemy counter at start of game
+        Enemy.enemiesDestroyed = 0;
+
+        UpdateLivesUI();
+        UpdateEnemiesUI();
+    }
+
     void Update()
-
     {
-        //Set the direction vector based on the users input
-        //Horizontal
-        if(Input.GetKey(KeyCode.D))
-        {
-            direction.x = 1;
-        }
-        else if(Input.GetKey(KeyCode.A))
-        {
-            direction.x = -1;
-        }
-        else
-        {
-            direction.x = 0;
-        }
-        //Vertical
-        if(Input.GetKey(KeyCode.W))
-        {
-            direction.y = 1;
-        }
-        else if(Input.GetKey(KeyCode.S))
-        {
-            direction.y = -1;
-        }
-        else
-        {
-            direction.y = 0;
-        }
+        // Movement input
+        movement.x = Input.GetAxisRaw("Horizontal");
+        movement.y = Input.GetAxisRaw("Vertical");
+        movement = movement.normalized;
 
-        //Make the direction vector have a length of 1 so the player moves at the correct speed
-        direction = direction.normalized;
+        // Aim toward mouse
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 direction = mousePos - transform.position;
+
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0f, 0f, angle);
+
+        // Update enemies left UI
+        UpdateEnemiesUI();
     }
 
-    private void FixedUpdate()
+    void FixedUpdate()
     {
-        //(0,0)
-        //(1,0)
-        //(0,1)
-        //(1,1)
-
-
-
-        //Move of the character
-        rb.MovePosition(rb.position + (direction * speed * Time.fixedDeltaTime));
+        rb.linearVelocity = movement * moveSpeed;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
-        //Subtract the damage the bullet does from the health
-        health -= collision.GetComponent<Bullet>().damage;
-
-        //Destroy the bullet
-        Destroy(collision.gameObject);
+        if (collision.CompareTag("Enemy"))
+        {
+            TakeHit();
+        }
     }
-    private void OnDrawGizmos()
+
+    void TakeHit()
     {
-        //Draw the direction vector as a black line
-        Gizmos.color = Color.black;
-        Gizmos.DrawLine(Vector3.zero, (Vector3)direction);
+        currentHits--;
+        UpdateLivesUI();
+
+        if (currentHits <= 0)
+        {
+            Die();
+        }
+    }
+
+    void UpdateLivesUI()
+    {
+        if (livesText != null)
+        {
+            livesText.text = "Lives: " + currentHits;
+        }
+    }
+
+    void UpdateEnemiesUI()
+    {
+        if (enemiesLeftText != null)
+        {
+            int remaining = maxEnemies - Enemy.enemiesDestroyed;
+
+            if (remaining < 0) remaining = 0;
+
+            enemiesLeftText.text = "Enemies Left: " + remaining;
+        }
+    }
+
+    void Die()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
