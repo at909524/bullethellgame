@@ -8,7 +8,10 @@ public class Enemy : MonoBehaviour
     [Header("Health")]
     public int maxHealth = 3;
 
-    // 👇 Shared counter across all enemies
+    [Header("Rewards")]
+    public int pointsOnDeath = 10;
+
+    // Shared across all enemies
     public static int enemiesDestroyed = 0;
 
     private int currentHealth;
@@ -25,8 +28,15 @@ public class Enemy : MonoBehaviour
         currentHealth = maxHealth;
 
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+
         if (playerObj != null)
+        {
             player = playerObj.transform;
+        }
+        else
+        {
+            Debug.LogWarning("Player not found! Make sure it is tagged 'Player'");
+        }
     }
 
     void FixedUpdate()
@@ -37,6 +47,7 @@ public class Enemy : MonoBehaviour
         rb.linearVelocity = direction * moveSpeed;
     }
 
+    // Called by bullet
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
@@ -49,16 +60,24 @@ public class Enemy : MonoBehaviour
 
     void Die()
     {
-        enemiesDestroyed++;   // 👈 increase counter
+        enemiesDestroyed++; // 👈 for "Enemies Left" UI
+
+        // 👇 give points
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.AddPoints(pointsOnDeath);
+        }
+
         Destroy(gameObject);
     }
 
-    // Optional: despawn on player contact (trigger version)
+    // Despawn when touching player (no pushback)
     void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
         {
-            enemiesDestroyed++; // still counts as "removed"
+            enemiesDestroyed++; // still counts as removed
+
             Destroy(gameObject);
         }
     }

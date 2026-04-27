@@ -17,9 +17,15 @@ public class PlayerController : MonoBehaviour
     [Header("Game")]
     public int maxEnemies = 10;
 
-    private int currentHits;
+    [Header("Shooting")]
+    public GameObject bulletPrefab;
+    public float fireRate = 0.2f;
+
+
     private Rigidbody2D rb;
     private Vector2 movement;
+    private float fireTimer;
+    public int currentHits;
 
     void Awake()
     {
@@ -29,8 +35,6 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         currentHits = maxHits;
-
-        // Reset enemy counter at start of game
         Enemy.enemiesDestroyed = 0;
 
         UpdateLivesUI();
@@ -39,19 +43,12 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // Movement input
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
         movement = movement.normalized;
 
-        // Aim toward mouse
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 direction = mousePos - transform.position;
-
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0f, 0f, angle);
-
-        // Update enemies left UI
+        AimAtMouse();
+        HandleShooting();
         UpdateEnemiesUI();
     }
 
@@ -60,31 +57,53 @@ public class PlayerController : MonoBehaviour
         rb.linearVelocity = movement * moveSpeed;
     }
 
+    void AimAtMouse()
+    {
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 dir = mousePos - transform.position;
+
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Euler(0f, 0f, angle);
+    }
+
+    void HandleShooting()
+    {
+        fireTimer -= Time.deltaTime;
+
+        if (Input.GetMouseButton(0) && fireTimer <= 0f)
+        {
+            
+            fireTimer = fireRate;
+        }
+    }
+
+
+
     void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Enemy"))
         {
-            TakeHit();
-        }
-    }
+            currentHits--;
+            UpdateLivesUI();
 
-    void TakeHit()
-    {
-        currentHits--;
-        UpdateLivesUI();
-
-        if (currentHits <= 0)
-        {
-            Die();
+            if (currentHits <= 0)
+                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 
     void UpdateLivesUI()
     {
         if (livesText != null)
-        {
             livesText.text = "Lives: " + currentHits;
-        }
+    }
+    public void AddLife(int amount)
+    {
+        currentHits += amount;
+
+        if (currentHits > maxHits)
+            currentHits = maxHits;
+
+        UpdateLivesUI();
     }
 
     void UpdateEnemiesUI()
@@ -92,15 +111,9 @@ public class PlayerController : MonoBehaviour
         if (enemiesLeftText != null)
         {
             int remaining = maxEnemies - Enemy.enemiesDestroyed;
-
             if (remaining < 0) remaining = 0;
 
             enemiesLeftText.text = "Enemies Left: " + remaining;
         }
-    }
-
-    void Die()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
