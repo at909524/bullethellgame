@@ -2,24 +2,42 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
+    public static EnemySpawner instance;
+
+    [Header("Enemy")]
     public GameObject enemyPrefab;
 
-    public float spawnInterval = 2f;
-    public int maxEnemies = 10;
+    [Header("Spawn Settings")]
+    public float spawnInterval = 0.5f;
 
-    private int totalSpawned = 0;
+    private int maxEnemies;
+    private int totalSpawned;
 
-    void Start()
+    void Awake()
     {
+        instance = this;
+    }
+
+
+    public void SpawnWave(int amount)
+    {
+        maxEnemies = amount;
+        totalSpawned = 0;
+
+        CancelInvoke(nameof(SpawnEnemy));
         InvokeRepeating(nameof(SpawnEnemy), 1f, spawnInterval);
+    }
+
+    public void StopSpawning()
+    {
+        CancelInvoke(nameof(SpawnEnemy));
     }
 
     void SpawnEnemy()
     {
-        // Stop spawning permanently after reaching max
         if (totalSpawned >= maxEnemies)
         {
-            CancelInvoke(nameof(SpawnEnemy)); // stop the spawner completely
+            CancelInvoke(nameof(SpawnEnemy));
             return;
         }
 
@@ -27,7 +45,7 @@ public class EnemySpawner : MonoBehaviour
 
         Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
 
-        totalSpawned++; // track total spawned
+        totalSpawned++;
     }
 
     Vector3 GetSpawnPosition()

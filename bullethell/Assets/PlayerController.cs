@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Health")]
     public int maxHits = 3;
+    public int maxUpgradableLives = 10;
 
     [Header("UI")]
     public TextMeshProUGUI livesText;
@@ -35,7 +36,6 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         currentHits = maxHits;
-        Enemy.enemiesDestroyed = 0;
 
         UpdateLivesUI();
         UpdateEnemiesUI();
@@ -79,17 +79,7 @@ public class PlayerController : MonoBehaviour
 
 
 
-    void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Enemy"))
-        {
-            currentHits--;
-            UpdateLivesUI();
 
-            if (currentHits <= 0)
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
-    }
 
     void UpdateLivesUI()
     {
@@ -98,7 +88,16 @@ public class PlayerController : MonoBehaviour
     }
     public void AddLife(int amount)
     {
-        currentHits += amount;
+
+        maxHits += amount;
+
+
+        if (maxHits > maxUpgradableLives)
+            maxHits = maxUpgradableLives;
+
+
+        currentHits += 1;
+
 
         if (currentHits > maxHits)
             currentHits = maxHits;
@@ -108,12 +107,22 @@ public class PlayerController : MonoBehaviour
 
     void UpdateEnemiesUI()
     {
-        if (enemiesLeftText != null)
+        if (enemiesLeftText != null && WaveManager.instance != null)
         {
-            int remaining = maxEnemies - Enemy.enemiesDestroyed;
-            if (remaining < 0) remaining = 0;
+            enemiesLeftText.text =
+                "Wave: " + WaveManager.instance.currentWave;
+        }
+    }
 
-            enemiesLeftText.text = "Enemies Left: " + remaining;
+    public void TakeDamage(int amount)
+    {
+        currentHits -= amount;
+
+        UpdateLivesUI();
+
+        if (currentHits <= 0)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 }

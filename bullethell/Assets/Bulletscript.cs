@@ -16,7 +16,7 @@ public class Bulletscript : MonoBehaviour
     void Start()
     {
         rb.linearVelocity = transform.right * speed;
-        Destroy(gameObject, lifetime); // backup cleanup
+        Destroy(gameObject, lifetime); 
     }
 
     void OnTriggerEnter2D(Collider2D collision)

@@ -42,14 +42,14 @@ public class UpgradeManager : MonoBehaviour
         }
     }
 
-    // ❤️ Extra Life Upgrade
+
     public void BuyExtraLife()
     {
         Debug.Log("Attempting to buy life");
 
         if (GameManager.instance == null)
         {
-            Debug.LogError("GameManager is NULL");
+
             return;
         }
 
@@ -83,12 +83,12 @@ public class UpgradeManager : MonoBehaviour
         hasMultiBarrel = true;
         shootingScript.barrelCount = 2;
 
-        // Spawn second barrel visually
+
         GameObject secondBarrel = Instantiate(barrelPrefab, weaponPivot);
 
         float totalSpacing = spacing + gap;
 
-        // Reposition BOTH barrels so they align correctly
+
         firstBarrel.localPosition =
             originalBarrelPos + new Vector3(0f, -totalSpacing / 2f, 0f);
 

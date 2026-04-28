@@ -7,12 +7,15 @@ public class Enemy : MonoBehaviour
 
     [Header("Health")]
     public int maxHealth = 3;
+    public bool isBoss = false;
+    public float bossHealthMultiplier = 5f;
+    public float bossSpeedMultiplier = 1.2f;
+    private bool isDead = false;
 
     [Header("Rewards")]
     public int pointsOnDeath = 10;
 
-    // Shared across all enemies
-    public static int enemiesDestroyed = 0;
+
 
     private int currentHealth;
     private Transform player;
@@ -25,6 +28,12 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
+        if (isBoss)
+        {
+            maxHealth = Mathf.RoundToInt(maxHealth * bossHealthMultiplier);
+            moveSpeed *= bossSpeedMultiplier;
+        }
+
         currentHealth = maxHealth;
 
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -32,10 +41,6 @@ public class Enemy : MonoBehaviour
         if (playerObj != null)
         {
             player = playerObj.transform;
-        }
-        else
-        {
-            Debug.LogWarning("Player not found! Make sure it is tagged 'Player'");
         }
     }
 
@@ -47,9 +52,11 @@ public class Enemy : MonoBehaviour
         rb.linearVelocity = direction * moveSpeed;
     }
 
-    // Called by bullet
+
     public void TakeDamage(int damage)
     {
+        killedByPlayer = true;
+
         currentHealth -= damage;
 
         if (currentHealth <= 0)
@@ -60,25 +67,39 @@ public class Enemy : MonoBehaviour
 
     void Die()
     {
-        enemiesDestroyed++; // 👈 for "Enemies Left" UI
+        if (isDead) return;
+        isDead = true;
 
-        // 👇 give points
-        if (GameManager.instance != null)
+        if (killedByPlayer)
         {
             GameManager.instance.AddPoints(pointsOnDeath);
         }
 
+        WaveManager.instance.EnemyKilled();
+
         Destroy(gameObject);
     }
 
-    // Despawn when touching player (no pushback)
     void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
         {
-            enemiesDestroyed++; // still counts as removed
+            PlayerController player = collision.GetComponent<PlayerController>();
 
-            Destroy(gameObject);
+            if (player == null) return;
+
+            if (isBoss)
+            {
+                player.TakeDamage(999);
+            }
+            else
+            {
+                player.TakeDamage(1);
+            }
+
+
+            Die();
         }
     }
+    private bool killedByPlayer = false;
 }

@@ -13,7 +13,7 @@ public class GameManager : MonoBehaviour
 
     void Awake()
     {
-        // Singleton setup
+
         if (instance == null)
         {
             instance = this;
@@ -30,14 +30,14 @@ public class GameManager : MonoBehaviour
         UpdateUI();
     }
 
-    // 🔥 Add points (used by enemies)
+
     public void AddPoints(int amount)
     {
         points += amount;
         UpdateUI();
     }
 
-    // 💰 Spend points (used by upgrades)
+
     public bool SpendPoints(int amount)
     {
         if (points >= amount)
@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
         return false;
     }
 
-    // 🧾 UI update
+
     void UpdateUI()
     {
         if (pointsText != null)
